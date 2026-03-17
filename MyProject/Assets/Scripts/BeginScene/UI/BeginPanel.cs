@@ -17,11 +17,15 @@ public class BeginPanel : BasePanel
     {
         btnStart.onClick.AddListener(() =>
         {
-            
+            Camera.main.GetComponent<CameraAnimator>().TurnLeft(() =>
+            {
+                UIManager.Instance.ShowPanel<ChooseHeroPanel>();
+            });
+            UIManager.Instance.HidePanel<BeginPanel>();
         });
         btnSetting.onClick.AddListener(() =>
         {
-            
+            UIManager.Instance.ShowPanel<SettingPanel>();
         });
         btnAbout.onClick.AddListener(() =>
         {

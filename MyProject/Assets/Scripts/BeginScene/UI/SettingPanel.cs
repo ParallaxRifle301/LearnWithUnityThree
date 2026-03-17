@@ -40,5 +40,6 @@ public class SettingPanel :BasePanel
         {
             GameDataMgr.Instance.musicData.soundvalue = v;
         });
+        
     }
 }
