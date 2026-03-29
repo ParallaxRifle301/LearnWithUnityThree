@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,86 +18,83 @@ public class ChooseHeroPanel : BasePanel
     private GameObject heroObj;
     private RoleInfo nowRoleData;
     private int nowIndex;
+
     public override void Init()
     {
         heroPos = GameObject.Find("HeroPos").transform;
-        txtMoney.text=GameDataMgr.Instance.playerData.haveMoney.ToString();
-        
+        txtMoney.text = GameDataMgr.Instance.playerData.haveMoney.ToString();
+
         btnLeft.onClick.AddListener(() =>
         {
             --nowIndex;
             if (nowIndex < 0)
-            {
-                nowIndex = GameDataMgr.Instance.roleInfoList.Count-1;
-                
-            }
-
+                nowIndex = GameDataMgr.Instance.roleInfoList.Count - 1;
             ChangeHero();
         });
+
         btnRight.onClick.AddListener(() =>
         {
             ++nowIndex;
             if (nowIndex >= GameDataMgr.Instance.roleInfoList.Count)
-            {
                 nowIndex = 0;
-            }
             ChangeHero();
         });
+
+        btnUnLock.onClick.AddListener(() =>
+        {
+            PlayerData data = GameDataMgr.Instance.playerData;
+            if(data.haveMoney >= nowRoleData.lockMoney)
+            {
+                data.haveMoney -= nowRoleData.lockMoney;
+                txtMoney.text = data.haveMoney.ToString();
+                data.buyHero.Add(nowRoleData.id);
+                GameDataMgr.Instance.SavePlayerData();
+                UpdateLockBtn();
+                UIManager.Instance.ShowPanel<TipPanel>().ChangeInfo("购买成功");
+            }
+            else
+            {
+                UIManager.Instance.ShowPanel<TipPanel>().ChangeInfo("金钱不足");
+            }
+        });
+
         btnStart.onClick.AddListener(() =>
         {
             GameDataMgr.Instance.nowSelRole = nowRoleData;
-            
             UIManager.Instance.HidePanel<ChooseHeroPanel>();
+            UIManager.Instance.ShowPanel<ChooseScenePanel>();
         });
+
         btnBack.onClick.AddListener(() =>
         {
             UIManager.Instance.HidePanel<ChooseHeroPanel>();
-            Camera.main.GetComponent<CameraAnimator>().TurnRight(() =>
+            Camera.main.GetComponent<CameraAnimator>().TurnRgiht(() =>
             {
                 UIManager.Instance.ShowPanel<BeginPanel>();
             });
         });
-        btnUnLock.onClick.AddListener(() =>
-        {
-            PlayerData data = GameDataMgr.Instance.playerData;
-            if (data.haveMoney >= nowRoleData.lockMoney)
-            {
-                data.haveMoney -= nowRoleData.lockMoney;
-                txtMoney.text = data.haveMoney.ToString();
-                
-                data.buyHero.Add(nowRoleData.id);
-                GameDataMgr.Instance.SavePlayerData();
-                
-                UpdateLockBtn();
-                UIManager.Instance.ShowPanel<TipPanel>().ChangeInfo("succeed");
-                
-            }
-            else
-            {UIManager.Instance.ShowPanel<TipPanel>().ChangeInfo("failed");
-            }
-        });
         ChangeHero();
-        
     }
-
     private void ChangeHero()
     {
-        if (heroObj != null)
+        if(heroObj != null)
         {
             Destroy(heroObj);
             heroObj = null;
         }
         nowRoleData = GameDataMgr.Instance.roleInfoList[nowIndex];
-        heroObj = Instantiate(Resources.Load<GameObject>(nowRoleData.res),heroPos.position, heroPos.rotation);
+        heroObj = Instantiate(Resources.Load<GameObject>(nowRoleData.res), heroPos.position, heroPos.rotation);
+        Destroy(heroObj.GetComponent<PlayerObject>());
+        txtName.text = nowRoleData.tips;
         UpdateLockBtn();
     }
-
+    
     private void UpdateLockBtn()
     {
-        if (nowRoleData.lockMoney > 0 && !GameDataMgr.Instance.playerData.buyHero.Contains(nowRoleData.id))
+        if( nowRoleData.lockMoney > 0 && !GameDataMgr.Instance.playerData.buyHero.Contains(nowRoleData.id) )
         {
             btnUnLock.gameObject.SetActive(true);
-            txtUnLock.text = "%" + nowRoleData.lockMoney;
+            txtUnLock.text = "￥" + nowRoleData.lockMoney;
             btnStart.gameObject.SetActive(false);
         }
         else
@@ -110,7 +107,7 @@ public class ChooseHeroPanel : BasePanel
     public override void HideMe(UnityAction callBack)
     {
         base.HideMe(callBack);
-        if (heroObj != null)
+        if(heroObj != null)
         {
             DestroyImmediate(heroObj);
             heroObj = null;

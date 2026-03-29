@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,32 +6,25 @@ using UnityEngine.Events;
 public class CameraAnimator : MonoBehaviour
 {
     private Animator animator;
-
     private UnityAction overAction;
-
     // Start is called before the first frame update
     void Start()
     {
-        animator = GetComponent<Animator>();
+        animator = this.GetComponent<Animator>();
     }
-
     public void TurnLeft(UnityAction action)
     {
         animator.SetTrigger("Left");
         overAction = action;
     }
-
-    public void TurnRight(UnityAction action)
+    public void TurnRgiht(UnityAction action)
     {
         animator.SetTrigger("Right");
         overAction = action;
     }
-
     public void PlayerOver()
     {
         overAction?.Invoke();
         overAction = null;
     }
-    
-    
 }
